@@ -3,7 +3,6 @@ package org.example;
 import org.hibernate.query.Query;
 
 import javax.persistence.*;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
 
@@ -12,7 +11,7 @@ import java.util.Scanner;
  *
  */
 public class App {
-
+    ControlDeErrores control = new ControlDeErrores();
 
     public static void main( String[] args ) {
 
@@ -51,6 +50,7 @@ public class App {
             case 2:
                 mostrarInstitutos(manager);
                 mostrarClases(manager);
+                mostrarAlumnos(manager);
                 break;
             case 3:
                 //mostrarDatos();
@@ -94,12 +94,13 @@ public class App {
             System.out.println("\n*************************************************************************************");
 
             int opcion = leerOpcionMenu(sc, 5);
+            mostrarInstitutos(manager);
+            mostrarClases(manager);
+            mostrarAlumnos(manager);
 
             switch (opcion) {
                 case 1:
-                    mostrarInstitutos(manager);
-                    mostrarClases(manager);
-                    mostrarAlumnos(manager);
+
                     insertarAlumno(sc, manager);
                     break;
                 case 2:
@@ -116,87 +117,77 @@ public class App {
             }
         }
     }
-    boolean verificarSiExiste(EntityManager manager, int idclaseAlum){
-
-        if ( manager.find(Clase.class, idclaseAlum) == null) {
-            System.out.println("No existe este id de clase");
-            System.out.println("Introduce un valor válido");
-        }else return false;
-        return true;
-    }
-    boolean verificarSiExisteDNI(EntityManager manager, int idclaseAlum, int dni){
-        if ( manager.find(Alumno.class, dni) != null) {
-
-            if (manager.find(Alumno.class, idclaseAlum) != null) {
-                System.out.println("Este alumno ya esta matriculado en esta clase");
-                System.out.println("Introduce un valor válido");
-            }
-        }else return false;
-        return true;
-    }
 
     void insertarAlumno(Scanner sc, EntityManager manager) {
         boolean existe = true;
         int idclaseAlum = 0;
         int dni = 0;
         String nombreAlumno = "";
-
         System.out.println("\n**********************   INSERTAR ALUMNO  **************************************\n");
+
+        // while para verificar si existe el id de la clase
         while (existe){
             System.out.print("\t\t 1. Id Clase: ");
-            idclaseAlum = sc.nextInt();
-            existe = verificarSiExiste(manager, idclaseAlum);
+            idclaseAlum = sc.nextInt(); sc.nextLine();
+            existe = control.verificaridClaseAlumno(manager, idclaseAlum);
         }
         existe = true;
-        sc.nextLine();
         System.out.print("\t\t 1. Nombre del alumno: ");
         nombreAlumno = sc.nextLine();
-        while(true) {
-            try {
-                System.out.print("\t\t 1. DNI: ");
-                dni = sc.nextInt();
 
-                // existe = verificarSiExisteDNI(manager, dni, idclaseAlum);
+        // While para verificar si el DNI ya existe
+        while(existe) {
 
-            } catch (EntityExistsException e) {
-                System.out.println("Este alumno ya existe");
-                System.out.println("Introduce un valor válido");
-            }
+            System.out.print("\t\t 1. DNI: ");
+            dni = sc.nextInt();
+            existe = control.verificarDni(manager, dni);
         }
-        sc.nextLine();
+                System.out.println("\n*************************************************************************************");
+                Alumno alumno = new Alumno();
+                alumno.setClasseId(idclaseAlum);
+                alumno.setNombre(nombreAlumno);
+                alumno.setDNI(dni);
 
-        System.out.println("\n*************************************************************************************");
+                manager.getTransaction().begin();
+                manager.persist(alumno);
+                existe = false;
+            manager.getTransaction().commit();
 
-        Alumno alumno = new Alumno();
-        alumno.setClasseId(idclaseAlum);
-        alumno.setNombre(nombreAlumno);
-        alumno.setDNI(dni);
 
-        manager.getTransaction().begin();
-        manager.persist(alumno);
-        manager.getTransaction().commit();
+
+
     }
 
     void insertarClasse(Scanner sc, EntityManager manager){
+        boolean existe = true;
+        int idclase = 0;
+        int idInstClase = 0;
         System.out.println("\n**********************   INSERTAR CLASE  **************************************\n");
-        System.out.print("\t\t 1. Id Clase: ");
-        int idclase = sc.nextInt();sc.nextLine();
+
+        while(existe) {
+            System.out.print("\t\t 1. Id Clase: ");
+            idclase = sc.nextInt();
+            sc.nextLine();
+            existe = control.verificarIdClase(manager, idclase);
+        }
+        existe = true;
         System.out.print("\t\t 1. Nombre de la clase: ");
         String nombreClase = sc.nextLine();
         System.out.print("\t\t 1. Rama: ");
         String rama = sc.nextLine();
-        System.out.print("\t\t 1. Número alumnos: ya hecho");
-        // int numeroAlumnosClase = sc.nextInt(); sc.nextLine();
-        System.out.print("\t\t 1. Id instituto: ");
-        int idInstClase = sc.nextInt();
 
+        while(existe) {
+            System.out.print("\t\t 1. Id instituto: ");
+            idInstClase = sc.nextInt();
+            existe = control.verificarIdInstituto(manager, idInstClase);
+        }
         System.out.println("\n*************************************************************************************");
 
         Clase clase = new Clase();
         clase.setId(idclase);
         clase.setNombre(nombreClase);
         clase.setRama(rama);
-        //clase.setNAlumnos(numeroAlumnosClase);
+        clase.setNAlumnos(0);
         clase.setIdInstituto(idInstClase);
         manager.getTransaction().begin();
         manager.persist(clase);
@@ -204,11 +195,23 @@ public class App {
     }
 
     void insertarInstituto(Scanner sc, EntityManager manager){
+        boolean existe = true;
+        int idInst = 0;
+        String nombreInst = "";
         System.out.println("\n**********************   INSERTAR INSTITUTO  **************************************\n");
-        System.out.print("\t\t 1. Id instituo: ");
-        int idInst = sc.nextInt(); sc.nextLine();
-        System.out.print("\t\t 1. Nombre instituto: ");
-        String nombreInst = sc.nextLine();
+
+        while(existe) {
+            System.out.print("\t\t 1. Id instituo: ");
+            idInst = sc.nextInt();sc.nextLine();
+            existe = control.verificarInsertInsti(manager, idInst);
+        }
+        existe = true;
+
+        while(existe) {
+            System.out.print("\t\t 1. Nombre instituto: ");
+            nombreInst = sc.nextLine();
+            existe = control.verificarNombreInst(manager, nombreInst);
+        }
         //TODO eliminar aixo
         System.out.print("\t\t 1. Número de alumnos: ");
         int numeroAlumnos = sc.nextInt();
@@ -272,17 +275,13 @@ public class App {
                 (TypedQuery<Integer>) manager.createQuery("SELECT id FROM Clase");
         List<Integer> resultsClases = queryClaseId.getResultList();
 
-//        for ( Integer institutoId: resultsInsti) {
-//            System.out.println("bucle insti: " + institutoId);
         for (Integer clasesId : resultsClases) {
-            System.out.println("clase id: " + clasesId);
             Query<Long> query =
                     (Query<Long>) manager.createQuery("SELECT  COUNT(*) FROM Alumno WHERE clase_id = ?1 ");
             query.setParameter(1, clasesId);
             //query.setParameter(2, institutoId);
 
             Long results = query.getSingleResult();
-            System.out.println("Clase: " + clasesId + " hi ha " + results + " alumnes");
             Clase clase = manager.find(Clase.class, clasesId);
 
             clase.setNAlumnos(Math.toIntExact(results));
