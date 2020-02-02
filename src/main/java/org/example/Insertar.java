@@ -89,15 +89,10 @@ public class Insertar {
 
             existe = control.verificarNombreInst(manager, nombreInst);
         }
-        //TODO eliminar aixo
-        System.out.print("\t\t 1. Número de alumnos: ");
-        int numeroAlumnos = sc.nextInt();
-        System.out.println("\n*************************************************************************************");
-
         Instituto puig = new Instituto();
         puig.setId(idInst);
         puig.setNombre(nombreInst);
-        puig.setNumAlumnos(numeroAlumnos);
+        puig.setNumAlumnos(0);
 
         manager.getTransaction().begin();
         manager.persist(puig);

@@ -44,18 +44,19 @@ public class ControlDeErrores {
     }
     boolean verificarNombreInst(EntityManager manager, String nombre){
 
-//        TypedQuery<Instituto> queryty =
-//                manager.createQuery("SELECT i FROM Instituto i WHERE i.nombre like :nombre", Instituto.class);
-//        queryty.setParameter("nombre", nombre);
-//        List<Instituto> results = queryty.getResultList();
-//
-//        if ( results.size() == 0){
-//            System.out.println("ok");
+        TypedQuery<Instituto> queryty =
+                manager.createQuery("SELECT i FROM Instituto i WHERE nombre like :nombre", Instituto.class);
+        queryty.setParameter("nombre", nombre);
+        List<Instituto> results = queryty.getResultList();
+
+        if ( results.size() == 0){
+            System.out.println("\nInstituto insertado correctamente");
+            System.out.println("    //** El número de alumnos será inseratado automáticamente **//");
             return false;
-//        }else{
-//            System.out.println("eroror");
-//            return true;
-//        }
+        }else{
+            System.out.println("Ya existe un instituto con este nombre");
+            return true;
+        }
     }
     int leerInt( Scanner sc, String texto){
         int numero= 0;
