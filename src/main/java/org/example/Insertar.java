@@ -28,14 +28,19 @@ public class Insertar {
             existe = control.verificarDni(manager, dni);
         }
         System.out.println("\n*************************************************************************************");
-        Alumno alumno = new Alumno();
-        alumno.setClasseId(idclaseAlum);
-        alumno.setNombre(nombreAlumno);
-        alumno.setDNI(dni);
 
-        manager.getTransaction().begin();
-        manager.persist(alumno);
-        manager.getTransaction().commit();
+        try {
+            Alumno alumno = new Alumno();
+            alumno.setClasseId(idclaseAlum);
+            alumno.setNombre(nombreAlumno);
+            alumno.setDNI(dni);
+
+            manager.getTransaction().begin();
+            manager.persist(alumno);
+            manager.getTransaction().commit();
+        }catch (Exception e){
+            System.out.println("Hubo algun problema en la conexión");
+        }
     }
 
     void insertarClasse(Scanner sc, EntityManager manager){
@@ -60,15 +65,19 @@ public class Insertar {
         }
         System.out.println("\n*************************************************************************************");
 
-        Clase clase = new Clase();
-        clase.setId(idclase);
-        clase.setNombre(nombreClase);
-        clase.setRama(rama);
-        clase.setNAlumnos(0);
-        clase.setIdInstituto(idInstClase);
-        manager.getTransaction().begin();
-        manager.persist(clase);
-        manager.getTransaction().commit();
+        try {
+            Clase clase = new Clase();
+            clase.setId(idclase);
+            clase.setNombre(nombreClase);
+            clase.setRama(rama);
+            clase.setNAlumnos(0);
+            clase.setIdInstituto(idInstClase);
+            manager.getTransaction().begin();
+            manager.persist(clase);
+            manager.getTransaction().commit();
+        }catch (Exception e){
+            System.out.println("Hubo algun problema en la conexión");
+        }
     }
 
     void insertarInstituto(Scanner sc, EntityManager manager){
@@ -89,14 +98,19 @@ public class Insertar {
 
             existe = control.verificarNombreInst(manager, nombreInst);
         }
-        Instituto puig = new Instituto();
-        puig.setId(idInst);
-        puig.setNombre(nombreInst);
-        puig.setNumAlumnos(0);
 
-        manager.getTransaction().begin();
-        manager.persist(puig);
-        manager.getTransaction().commit();
+        try {
+            Instituto puig = new Instituto();
+            puig.setId(idInst);
+            puig.setNombre(nombreInst);
+            puig.setNumAlumnos(0);
+            manager.getTransaction().begin();
+            manager.persist(puig);
+            manager.getTransaction().commit();
+        }catch (Exception e){
+            System.out.println("Hubo algun problema en la conexión");
+        }
+
     }
 
 }

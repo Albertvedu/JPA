@@ -1,10 +1,15 @@
 package org.example;
 
+import com.mysql.cj.x.protobuf.MysqlxSession;
+
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import java.util.List;
 
 public class Mostrar {
+    public static final String RED = "\033[0;31m";     // RED
+    public static final String WHITE_BOLD = "\033[1;37m";  // WHITE
+
     void mostrarOrdenado(EntityManager manager){
         TypedQuery<Instituto> queryInsti =
                 manager.createQuery("SELECT i FROM Instituto i ORDER BY id", Instituto.class);
@@ -12,7 +17,7 @@ public class Mostrar {
 
         for (Instituto inst: resultsInsti) {
             System.out.println("\n\n\t\t\t\t\t\t\t\t\t\t\t###############################   INSTITUTO  ######################################");
-            System.out.println("\t\t\t\t\t\t\t\t\t\t\tid: " + inst.getId() + "\tinstituto: " + inst.getNombre() + "\tNúmero de alumnos: " + inst.getNumAlumnos());
+            System.out.println( "\t\t\t\t\t\t\t\t\t\t\tid: " + inst.getId() + "\tinstituto: " + inst.getNombre() + "\t\t\tTotal alumnos: " + inst.getNumAlumnos());
             TypedQuery<Clase> query =
                     manager.createQuery("SELECT c FROM Clase c WHERE instituto_id = ?1 ORDER BY id", Clase.class);
             query.setParameter(1, inst);
@@ -29,13 +34,16 @@ public class Mostrar {
                 queryAlum.setParameter(1, cosas);
 
                 List<Alumno> resultsAlum = queryAlum.getResultList();
-                System.out.println("\n\t\t\t\t\t\t\t\t\t\t\t\t\t*************************   ALUMNOS ***********************************");
 
-                for (Alumno a : resultsAlum) {
+                if (resultsAlum.size() != 0 ) {
+                    System.out.println("\n\t\t\t\t\t\t\t\t\t\t\t\t\t*************************   ALUMNOS ***********************************");
 
-                    System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tClase_id: " + a.getClasseId() + "\tNombre: " + a.getNombre() + "\tDNI: " + a.getDNI());
+                    for (Alumno a : resultsAlum) {
+
+                        System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tClase_id: " + a.getClasseId() + "\tNombre: " + a.getNombre() + "\tDNI: " + a.getDNI());
+                    }
+                    System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t***********************************************************************");
                 }
-                System.out.println("\t\t\t\t\t\t\t\t\t\t\t\t\t\t***********************************************************************");
 
             }
             System.out.println("\t\t\t\t\t\t\t\t\t\t\t###################################################################################");
@@ -49,7 +57,7 @@ public class Mostrar {
         System.out.println("\n\t\t\t\t\t\t\t\t\t\t\t###############################   INSTITUTO  ######################################");
 
         for (Instituto inst: resultsInsti) {
-            System.out.println("\t\t\t\t\t\t\t\t\t\t\tid: " + inst.getId() + "\tinstituto: " + inst.getNombre() + "\tNúmero de alumnos: " + inst.getNumAlumnos());
+            System.out.println("\t\t\t\t\t\t\t\t\t\t\tid: " + inst.getId() + "\tinstituto: " + inst.getNombre() + "\t\t\tTotal alumnos: " + inst.getNumAlumnos());
         }
         System.out.println("\t\t\t\t\t\t\t\t\t\t\t###################################################################################");
 
